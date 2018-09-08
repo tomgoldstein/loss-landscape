@@ -67,35 +67,6 @@ def load_dataset(dataset='cifar10', datapath='cifar10/data', batch_size=128, \
         test_loader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
                                                   shuffle=False, num_workers=threads)
 
-    elif dataset == 'imagenet':
-        # load the imagenet dataset
-        traindir = os.path.join(datapath, 'train')
-        valdir = os.path.join(datapath, 'val')
-        normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                         std=[0.229, 0.224, 0.225])
-
-        train_dataset = torchvision.datasets.ImageFolder(
-            traindir,
-            transforms.Compose([
-                transforms.CenterCrop(224),
-                transforms.ToTensor(),
-                normalize,
-        ]))
-
-        train_loader = torch.utils.data.DataLoader(
-            train_dataset, batch_size=batch_size, shuffle=False,
-            num_workers=threads, pin_memory=True, sampler=None)
-
-        test_loader = torch.utils.data.DataLoader(
-            torchvision.datasets.ImageFolder(valdir, transforms.Compose([
-                transforms.Scale(256),
-                transforms.CenterCrop(224),
-                transforms.ToTensor(),
-                normalize,
-            ])),
-            batch_size=batch_size, shuffle=False,
-            num_workers=threads, pin_memory=True)
-
     return train_loader, test_loader
 
 

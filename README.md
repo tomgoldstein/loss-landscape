@@ -12,19 +12,18 @@ The direction(s) and the surface values are saved in HDF5 (`.h5`) files.
 
 **Environment**: A (multi-) GPU node with following software/libraries installed:
 - [PyTorch 0.4](https://pytorch.org/)
-- [openmpi](https://www.open-mpi.org/)
-- [mpi4py](https://mpi4py.scipy.org/docs/usrman/install.html)
+- [openmpi 3.1.2](https://www.open-mpi.org/)
+- [mpi4py 2.0.0](https://mpi4py.scipy.org/docs/usrman/install.html)
 - [numpy 1.15.1](https://docs.scipy.org/doc/numpy/user/quickstart.html)  
 - [h5py 2.8.0](http://docs.h5py.org/en/stable/build.html#install)
-- [matplotlib](https://matplotlib.org/users/installing.html)
--
+- [matplotlib 2.0.2](https://matplotlib.org/users/installing.html)
 
 **Pre-trained models**:
 The code accepts pre-trained PyTorch models for CIFAR-10 dataset.
 To load the pre-trained model correctly, the model file should contain `state_dict`, which is saved from the `state_dict()` method.
 The default saving folder for pre-trained networks is `cifar10/trained_nets/`.
 
-The pre-trained models can be downloaded [here](TODO):
+The pre-trained models can be downloaded [here](https://www.cs.umd.edu/~tomg/projects/landscapes/):
 
 
 **Data preprocessing**:
@@ -75,11 +74,9 @@ mpirun -n 4 python plot_surface.py --model resnet56 --x=-1:1:51 --y=-1:1:51 \
 --mpi --cuda --dir_type weights --xnorm filter --xignore biasbn --ynorm filter --yignore biasbn
 ```
 
-`plot_surface.py` automatically generates 1D curves or 2D loss contours at the end.
-
 ![ResNet-56](doc/images/resnet56_random_[-1.0,1.0]x[-1.0,1.0].h5_2dcontour.jpg)
 
-We can also customize the plots given an estimated `.h5` file with `plot_2D.py`, which supports plotting the loss/accuracy/error surface for both training and validation set.
+We can also customize the plots given a surface `.h5` file with `plot_2D.py`, which supports plotting the loss/accuracy/error surface for both training and validation set.
 
 ```
 python plot_2D.py --file path_to_surface_file --surface_name train_loss
@@ -108,20 +105,14 @@ python h52vtp.py --file path_to_surf_file --zmax  10 --log
  - `Save screenshot` in the File menu saves the image, which can be cropped elsewhere.
 
 
-<!--
-## Visualizing the optimization trajectories
-## Visualizing the eigen values of hessian matrix
--->
-
-
 ## Citation
 If you find this repo useful in your research, please cite:
 
 ```
-@article{visualloss,
+@inproceedings{visualloss,
   title={Visualizing the Loss Landscape of Neural Nets},
   author={Li, Hao and Xu, Zheng and Taylor, Gavin and Studer, Christoph and Goldstein, Tom},
-  journal={Neural Information Processing Systems},
+  booktitle={Neural Information Processing Systems},
   year={2018}
 }
 ```
