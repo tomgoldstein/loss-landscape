@@ -1,0 +1,9 @@
+*.pyc
+*.DS_Store
+*.t7
+*.pth
+*.pdf
+cifar10/plots/*.png
+cifar10/plots/*.h5
+cifar10/data/
+cifar10/trained_nets/
