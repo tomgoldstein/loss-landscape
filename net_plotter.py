@@ -150,7 +150,7 @@ def normalize_directions_for_states(direction, states, norm='filter', ignore='ig
     assert(len(direction) == len(states.items()))
     for d, (k, w) in zip(direction, states.items()):
         if d.dim() <= 1:
-            if dir_ignore == 'biasbn':
+            if ignore == 'biasbn':
                 d.fill_(0) # ignore directions for weights with 1 dimension
             else:
                 # keep directions for weights/bias that are only 1 per node
