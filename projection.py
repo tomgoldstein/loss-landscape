@@ -28,10 +28,10 @@ def list_to_vec(weights):
     v = []
     direction = [d*np.float64(1.0) for d in weights]
     for w in direction:
-        w = torch.Tensor(w)
+        w = torch.tensor(w)
         if w.dim() > 1:
             v.append(w.view(w.numel()))
-        else:
+        elif w.dim() == 1:
             v.append(w)
     return torch.cat(v)
 
