@@ -42,8 +42,8 @@ def eval_loss(net, criterion, loader, use_cuda=False):
                 outputs = net(inputs)
                 loss = criterion(outputs, targets)
                 total_loss += loss.item()*batch_size
-                _, predicted = outputs.max(1)
-                correct += predicted.eq(targets.data).sum()
+                _, predicted = torch.max(outputs.data, 1)
+                correct += predicted.eq(targets.data).cpu().sum().item()
 
         elif isinstance(criterion, nn.MSELoss):
             for batch_idx, (inputs, targets) in enumerate(loader):
@@ -61,8 +61,6 @@ def eval_loss(net, criterion, loader, use_cuda=False):
                 loss = criterion(outputs, one_hot_targets)
                 total_loss += loss.item()*batch_size
                 _, predicted = torch.max(outputs.data, 1)
-                correct += predicted.cpu().eq(targets).sum()
+                correct += predicted.cpu().eq(targets).sum().item()
 
     return total_loss/total, 100.*correct/total
-
-

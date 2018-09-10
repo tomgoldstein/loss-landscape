@@ -51,7 +51,7 @@ def train(trainloader, net, criterion, optimizer, use_cuda=True):
             optimizer.step()
             train_loss += loss.item()*batch_size
             _, predicted = torch.max(outputs.data, 1)
-            correct += predicted.eq(targets.data).cpu().sum()
+            correct += predicted.eq(targets.data).cpu().sum().item()
 
     elif isinstance(criterion, nn.MSELoss):
         for batch_idx, (inputs, targets) in enumerate(trainloader):
@@ -70,9 +70,10 @@ def train(trainloader, net, criterion, optimizer, use_cuda=True):
             optimizer.step()
             train_loss += loss.item()*batch_size
             _, predicted = torch.max(outputs.data, 1)
-            correct += predicted.cpu().eq(targets).cpu().sum()
+            correct += predicted.cpu().eq(targets).cpu().sum().item()
 
     return train_loss/total, 100 - 100.*correct/total
+
 
 def test(testloader, net, criterion, use_cuda=True):
     net.eval()
@@ -92,7 +93,7 @@ def test(testloader, net, criterion, use_cuda=True):
             loss = criterion(outputs, targets)
             test_loss += loss.item()*batch_size
             _, predicted = torch.max(outputs.data, 1)
-            correct += predicted.eq(targets.data).cpu().sum()
+            correct += predicted.eq(targets.data).cpu().sum().item()
 
     elif isinstance(criterion, nn.MSELoss):
         for batch_idx, (inputs, targets) in enumerate(testloader):
@@ -109,7 +110,7 @@ def test(testloader, net, criterion, use_cuda=True):
             loss = criterion(outputs, one_hot_targets)
             test_loss += loss.item()*batch_size
             _, predicted = torch.max(outputs.data, 1)
-            correct += predicted.cpu().eq(targets).cpu().sum()
+            correct += predicted.cpu().eq(targets).cpu().sum().item()
 
     return test_loss/total, 100 - 100.*correct/total
 
@@ -196,7 +197,7 @@ if __name__ == '__main__':
     f = open('trained_nets/' + save_folder + '/log.out', 'a', 0)
 
     trainloader, testloader = dataloader.get_data_loaders(args)
-    
+
     if args.label_corrupt_prob and not args.resume_model:
         torch.save(trainloader, 'trained_nets/' + save_folder + '/trainloader.dat')
         torch.save(testloader, 'trained_nets/' + save_folder + '/testloader.dat')
