@@ -27,16 +27,16 @@ import h5py
 import numpy as np
 from scipy import interpolate
 
-def h5_to_vtp(filename, surface_name='loss_vals', log=False, zmax=-1, interp=-1):
+def h5_to_vtp(surf_file, surf_name='train_loss', log=False, zmax=-1, interp=-1):
     #set this to True to generate points
     show_points = False
     #set this to True to generate polygons
     show_polys = True
 
-    f = h5py.File(filename,'r')
+    f = h5py.File(surf_file,'r')
 
     [xcoordinates, ycoordinates] = np.meshgrid(f['xcoordinates'][:], f['ycoordinates'][:][:])
-    vals = f[surface_name]
+    vals = f[surf_name]
 
     x_array = xcoordinates[:].ravel()
     y_array = ycoordinates[:].ravel()
@@ -53,16 +53,16 @@ def h5_to_vtp(filename, surface_name='loss_vals', log=False, zmax=-1, interp=-1)
         x_array = x_array.ravel()
         y_array = y_array.ravel()
 
-    output_filename = filename + "_" + surface_name
+    vtp_file = surf_file + "_" + surf_name
     if zmax > 0:
         z_array[z_array > zmax] = zmax
-        output_filename +=  "_zmax=" + str(zmax)
+        vtp_file +=  "_zmax=" + str(zmax)
 
     if log:
         z_array = np.log(z_array + 0.1)
-        output_filename +=  "_log"
-    output_filename +=  ".vtp"
-    print("Here's your output file:{}".format(output_filename))
+        vtp_file +=  "_log"
+    vtp_file +=  ".vtp"
+    print("Here's your output file:{}".format(vtp_file))
 
     number_points = len(z_array)
     print("number_points = {} points".format(number_points))
@@ -97,7 +97,7 @@ def h5_to_vtp(filename, surface_name='loss_vals', log=False, zmax=-1, interp=-1)
     avg_min_value = min(averaged_z_value_array)
     avg_max_value = max(averaged_z_value_array)
 
-    output_file = open(output_filename, 'w')
+    output_file = open(vtp_file, 'w')
     output_file.write('<VTKFile type="PolyData" version="1.0" byte_order="LittleEndian" header_type="UInt64">\n')
     output_file.write('  <PolyData>\n')
 
@@ -244,16 +244,16 @@ def h5_to_vtp(filename, surface_name='loss_vals', log=False, zmax=-1, interp=-1)
     output_file.write('')
     output_file.close()
 
-    print("Done with file:{}".format(output_filename))
+    print("Done with file:{}".format(vtp_file))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Convert h5 file to VTK file in XML that can be opened with ParaView')
     parser.add_argument('--file', '-f', default='', help='The h5 file that contains surface values')
-    parser.add_argument('--surface_name', default='loss_vals',
-		help='The type of surface to plot: loss_vals | test_loss | train_acc | test_acc | train_err | test_err')
+    parser.add_argument('--surf_name', default='train_loss',
+		help='The type of surface to plot: train_loss | test_loss | train_acc | test_acc | train_err | test_err')
     parser.add_argument('--zmax', default=-1, type=float, help='Maximum z value to map')
     parser.add_argument('--interp', default=-1, type=int, help='Interpolate the surface to this resolution (1000 recommended)')
     parser.add_argument('--log', action='store_true', default=False, help='log scale')
     args = parser.parse_args()
 
-    h5_to_vtp(args.file, args.surface_name, log=args.log, zmax=args.zmax, interp=args.interp)
+    h5_to_vtp(args.file, args.surf_name, log=args.log, zmax=args.zmax, interp=args.interp)
