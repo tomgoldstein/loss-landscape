@@ -103,7 +103,7 @@ def plot_trajectory(proj_file, dir_file, noshow=True):
     if show: plt.show()
 
 
-def plot_contour_trajectory(surf_file, dir_file, proj_file, surf_name='loss_vals',
+def plot_contour_trajectory(surf_file, dir_file, proj_file, surf_name='train_loss',
                             vmin=0.1, vmax=10, vlevel=0.5, noshow=True):
     """2D contour + trajectory"""
 
@@ -144,50 +144,13 @@ def plot_contour_trajectory(surf_file, dir_file, proj_file, surf_name='loss_vals
     if show: plt.show()
 
 
-def plot_2d_eig_ratio(surf_file, val_1='min_eig', val_2='max_eig', show=False):
-    """Plot the heatmap of eigenvalue ratios, i.e., |min_eig/max_eig| of hessian_matrix"""
-
-    f = h5py.File(surf_file,'r')
-    x = np.array(f['xcoordinates'][:])
-    y = np.array(f['ycoordinates'][:])
-    X, Y = np.meshgrid(x, y)
-
-    Z1 = np.array(f[val_1][:])
-    Z2 = np.array(f[val_2][:])
-    Z = np.absolute(np.divide(Z1, Z2))
-
-    print('--------------------------------------------------------------------')
-    print(surf_file)
-    print(Z)
-
-    if (len(x) <= 1 or len(y) <= 1):
-        print('The length of coordinates is not enough for plotting contours')
-        return
-
-    # Plot 2D heatmaps
-    fig = plt.figure()
-    plt.imshow(Z, interpolation='nearest')
-    fig.savefig(surf_file + '_' + val_1 + '_' + val_2 + '_ratio_heat.pdf',
-                dpi=300, bbox_inches='tight', format='pdf')
-
-    # Plot 2D heatmaps with color bar using seaborn
-    fig = plt.figure()
-    sns_plot = sns.heatmap(Z, cmap='viridis', vmin=0, vmax=.5, cbar=True,
-                           xticklabels=False, yticklabels=False)
-    sns_plot.invert_yaxis()
-    sns_plot.get_figure().savefig(surf_file + '_' + val_1 + '_' + val_2 + '_ratio_heat_sns.pdf',
-                                  dpi=300, bbox_inches='tight', format='pdf')
-
-    f.close()
-    if show: plt.show()
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Plot 2D loss surface')
     parser.add_argument('--surf_file', '-f', default='', help='The h5 file that contains surface values')
     parser.add_argument('--dir_file', default='', help='The h5 file that contains directions')
     parser.add_argument('--proj_file', default='', help='The h5 file that contains the projected trajectories')
-    parser.add_argument('--surf_name', default='loss_vals', help='The type of surface to plot')
+    parser.add_argument('--surf_name', default='train_loss', help='The type of surface to plot')
     parser.add_argument('--vmax', default=10, type=float, help='Maximum value to map')
     parser.add_argument('--vmin', default=0.1, type=float, help='Miminum value to map')
     parser.add_argument('--vlevel', default=0.5, type=float, help='plot contours every vlevel')

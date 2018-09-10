@@ -118,24 +118,6 @@ def plot_1d_loss_err_repeat(prefix, idx_min=1, idx_max=10, xmin=-1.0, xmax=1.0,
     if show: pp.show()
 
 
-def plot_1d_eig_ratio(surf_file, xmin=-1.0, xmax=1.0, val_1='min_eig', val_2='max_eig', ymax=1, show=True):
-
-    f = h5py.File(surf_file,'r')
-    x = f['xcoordinates'][:]
-
-    Z1 = np.array(f[val_1][:])
-    Z2 = np.array(f[val_2][:])
-    Z = np.absolute(np.divide(Z1, Z2))
-
-    pp.plot(x, Z)
-    pp.xlim(xmin, xmax)
-    pp.ylim(0, ymax)
-    pp.savefig(surf_file + '_1d_eig_ratio.pdf', dpi=300, bbox_inches='tight', format='pdf')
-
-    if show: pp.show()
-
-    f.close()
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Plott 1D loss and error curves')
