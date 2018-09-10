@@ -88,8 +88,10 @@ python plot_2D.py --surf_file path_to_surface_file --surface_name train_loss
 `plot_2D.py` produces a basic 3D loss surface with `matplotlib`.
 You may also want to render the 3D surface with [ParaView](http://paraview.org).
 
-![ResNet-56-noshort](doc/images/resnet56_noshort_small.jpg)
-![ResNet-56](doc/images/resnet56_small.jpg)
+|![ResNet-56-noshort](doc/images/resnet56_noshort_small.jpg)| ![ResNet-56](doc/images/resnet56_small.jpg)|
+|:----------:|:-------------:|
+|*ResNet-56-noshort*|*ResNet-56*|
+
 
 1. Convert the surface `.h5` file to the `.vtp` file.
 ```
