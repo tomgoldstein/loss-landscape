@@ -50,18 +50,23 @@ def load_dataset(dataset='cifar10', datapath='cifar10/data', batch_size=128, \
                 transforms.ToTensor(),
                 normalize,
             ])
+
         trainset = torchvision.datasets.CIFAR10(root=data_folder, train=True,
                                                 download=True, transform=transform)
-        indices = torch.tensor(np.arange(len(trainset)))
-        data_num = len(trainset)/data_split
-        ind_start = data_num*split_idx
-        ind_end = min(data_num*(split_idx + 1), len(trainset))
-        train_indices = indices[ind_start:ind_end]
-        train_sampler = torch.utils.data.sampler.SubsetRandomSampler(train_indices)
-        train_loader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
-                                                   sampler=train_sampler,
-                                                   shuffle=False, num_workers=threads)
-
+        if data_split > 1:
+            indices = torch.tensor(np.arange(len(trainset)))
+            data_num = len(trainset)/data_split
+            ind_start = data_num*split_idx
+            ind_end = min(data_num*(split_idx + 1), len(trainset))
+            train_indices = indices[ind_start:ind_end]
+            train_sampler = torch.utils.data.sampler.SubsetRandomSampler(train_indices)
+            train_loader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
+                                                       sampler=train_sampler,
+                                                       shuffle=False, num_workers=threads)
+        else:
+            kwargs = {'num_workers': 2, 'pin_memory': True}
+            train_loader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
+                                                      shuffle=False, **kwargs)
         testset = torchvision.datasets.CIFAR10(root=data_folder, train=False,
                                                download=False, transform=transform)
         test_loader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
