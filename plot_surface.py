@@ -61,13 +61,10 @@ def setup_surface_file(args, surf_file, dir_file):
 
     # Create the coordinates(resolutions) at which the function is evaluated
     xcoordinates = np.linspace(args.xmin, args.xmax, num=args.xnum)
-    shape = xcoordinates.shape
+    f['xcoordinates'] = xcoordinates
+
     if args.y:
         ycoordinates = np.linspace(args.ymin, args.ymax, num=args.ynum)
-        shape = (len(xcoordinates), len(ycoordinates))
-
-    f['xcoordinates'] = xcoordinates
-    if args.y:
         f['ycoordinates'] = ycoordinates
     f.close()
 
@@ -100,8 +97,7 @@ def crunch(surf_file, net, w, s, d, dataloader, loss_key, acc_key, comm, rank, a
     # Generate a list of indices of 'losses' that need to be filled in.
     # The coordinates of each unfilled index (with respect to the direction vectors
     # stored in 'd') are stored in 'coords'.
-    inds, coords, inds_nums = scheduler.get_job_indices(losses, xcoordinates,
-                                                        ycoordinates, comm)
+    inds, coords, inds_nums = scheduler.get_job_indices(losses, xcoordinates, ycoordinates, comm)
 
     print('Computing %d values for rank %d'% (len(inds), rank))
     start_time = time.time()
@@ -207,9 +203,11 @@ if __name__ == '__main__':
     parser.add_argument('--vlevel', default=0.5, type=float, help='plot contours every vlevel')
     parser.add_argument('--show', action='store_true', default=False, help='show plotted figures')
     parser.add_argument('--log', action='store_true', default=False, help='use log scale for loss values')
+    parser.add_argument('--plot', action='store_true', default=False, help='plot figures after computation')
 
     args = parser.parse_args()
 
+    torch.manual_seed(123)
     #--------------------------------------------------------------------------
     # Environment setup
     #--------------------------------------------------------------------------
@@ -245,19 +243,21 @@ if __name__ == '__main__':
     # Load models and extract parameters
     #--------------------------------------------------------------------------
     net = model_loader.load(args.dataset, args.model, args.model_file)
-    w = net_plotter.get_weights(net) # extract weights
+    w = net_plotter.get_weights(net) # initial parameters
     s = copy.deepcopy(net.state_dict()) # deepcopy since state_dict are references
     if args.ngpu > 1:
         # data parallel with multiple GPUs on a single node
         net = nn.DataParallel(net, device_ids=range(torch.cuda.device_count()))
 
     #--------------------------------------------------------------------------
-    # Setup the direction and surface file
+    # Setup the direction file and the surface file
     #--------------------------------------------------------------------------
     dir_file = net_plotter.name_direction_file(args) # name the direction file
+    if rank == 0:
+        net_plotter.setup_direction(args, dir_file, net)
+
     surf_file = name_surface_file(args, dir_file)
     if rank == 0:
-        net_plotter.setup_direction(args, dir_file, w, s)
         setup_surface_file(args, surf_file, dir_file)
 
     # wait until master has setup the direction file and surface file
@@ -277,6 +277,8 @@ if __name__ == '__main__':
     if rank == 0 and args.dataset == 'cifar10':
         torchvision.datasets.CIFAR10(root=args.dataset + '/data', train=True, download=True)
 
+    mpi4pytorch.barrier(comm)
+
     trainloader, testloader = dataloader.load_dataset(args.dataset, args.datapath,
                                 args.batch_size, args.threads, args.raw_data,
                                 args.data_split, args.split_idx,
@@ -285,14 +287,13 @@ if __name__ == '__main__':
     #--------------------------------------------------------------------------
     # Start the computation
     #--------------------------------------------------------------------------
-
     crunch(surf_file, net, w, s, d, trainloader, 'train_loss', 'train_acc', comm, rank, args)
     # crunch(surf_file, net, w, s, d, testloader, 'test_loss', 'test_acc', comm, rank, args)
 
     #--------------------------------------------------------------------------
     # Plot figures
     #--------------------------------------------------------------------------
-    if rank == 0:
+    if args.plot and rank == 0:
         if args.y and args.proj_file:
             plot_2D.plot_contour_trajectory(surf_file, dir_file, args.proj_file, 'train_loss', args.show)
         elif args.y:

@@ -28,8 +28,7 @@ def set_weights(net, weights, directions=None, step=None):
         for (p, w) in zip(net.parameters(), weights):
             p.data.copy_(w.type(type(p.data)))
     else:
-        assert step is not None, \
-        'If a direction is specified then the step size must be specified as well'
+        assert step is not None, 'If a direction is specified then step must be specified as well'
 
         if len(directions) == 2:
             dx = directions[0]
@@ -44,13 +43,12 @@ def set_weights(net, weights, directions=None, step=None):
 
 def set_states(net, states, directions=None, step=None):
     """
-        Overwrite the network's state_dict or change it along directions
-        with a step size.
+        Overwrite the network's state_dict or change it along directions with a step size.
     """
     if directions is None:
         net.load_state_dict(states)
     else:
-        assert step is not None, 'If direction is specified then step must be specified as well'
+        assert step is not None, 'If direction is provided then the step must be specified as well'
         if len(directions) == 2:
             dx = directions[0]
             dy = directions[1]
@@ -59,9 +57,11 @@ def set_states(net, states, directions=None, step=None):
             changes = [d*step for d in directions[0]]
 
         new_states = copy.deepcopy(states)
+        assert (len(new_states) == len(changes))
         for (k, v), d in zip(new_states.items(), changes):
             d = torch.tensor(d)
-            new_states[k].add_(d.type(v.type()))
+            v.add_(d.type(v.type()))
+
         net.load_state_dict(new_states)
 
 
@@ -131,8 +131,7 @@ def normalize_direction(direction, weights, norm='filter'):
 
 def normalize_directions_for_weights(direction, weights, norm='filter', ignore='biasbn'):
     """
-        The normalization scales the direction entries according to the
-        entries of weights.
+        The normalization scales the direction entries according to the entries of weights.
     """
     assert(len(direction) == len(weights))
     for d, w in zip(direction, weights):
@@ -140,21 +139,19 @@ def normalize_directions_for_weights(direction, weights, norm='filter', ignore='
             if ignore == 'biasbn':
                 d.fill_(0) # ignore directions for weights with 1 dimension
             else:
-                # keep directions for weights/bias that are only 1 per node
-                d.copy_(w)
+                d.copy_(w) # keep directions for weights/bias that are only 1 per node
         else:
             normalize_direction(d, w, norm)
 
 
 def normalize_directions_for_states(direction, states, norm='filter', ignore='ignore'):
-    assert(len(direction) == len(states.items()))
+    assert(len(direction) == len(states))
     for d, (k, w) in zip(direction, states.items()):
         if d.dim() <= 1:
             if ignore == 'biasbn':
                 d.fill_(0) # ignore directions for weights with 1 dimension
             else:
-                # keep directions for weights/bias that are only 1 per node
-                d.copy_(w)
+                d.copy_(w) # keep directions for weights/bias that are only 1 per node
         else:
             normalize_direction(d, w, norm)
 
@@ -162,84 +159,88 @@ def normalize_directions_for_states(direction, states, norm='filter', ignore='ig
 ################################################################################
 #                       Create directions
 ################################################################################
-def create_target_direction(w, s, net2, dir_type='states'):
+def create_target_direction(net, net2, dir_type='states'):
     """
         Setup a target direction from one model to the other
 
         Args:
-          w: a list of parameters (variables).
-          s: a list of parameters (variables) including BN's running mean/var.
-          net2: the target model with the same architecture.
-          dir_type: "weights" or  "states", type of directions.
+          net: the source model
+          net2: the target model with the same architecture as net.
+          dir_type: 'weights' or 'states', type of directions.
 
         Returns:
-          the target direction with the same dimension as weights or states.
+          direction: the target direction from net to net2 with the same dimension
+                     as weights or states.
     """
 
     assert (net2 is not None)
     # direction between net2 and net
     if dir_type == 'weights':
-        # direction between w2 and w
+        w = get_weights(net)
         w2 = get_weights(net2)
         direction = get_diff_weights(w, w2)
     elif dir_type == 'states':
-        # direction between s2 and s, including BN's statistics (running mean/var)
+        s = net.state_dict()
         s2 = net2.state_dict()
         direction = get_diff_states(s, s2)
 
     return direction
 
 
-def create_random_direction(w, s, dir_type='weights', ignore='biasbn', norm='filter'):
+def create_random_direction(net, dir_type='weights', ignore='biasbn', norm='filter'):
     """
         Setup a random (normalized) direction with the same dimension as
         the weights or states.
 
         Args:
-          w: a list of parameters (variables).
-          s: a list of parameters (variables), including BN's running mean/var.
-          dir_type: "weights" or  "states", type of directions.
-          ignore: "biasbn", ignore biases and BN parameters.
+          net: the given trained model
+          dir_type: 'weights' or 'states', type of directions.
+          ignore: 'biasbn', ignore biases and BN parameters.
           norm: direction normalization method, including
                 'filter" | 'layer' | 'weight' | 'dlayer' | 'dfilter'
 
         Returns:
-          a random direction with the same dimension as weights or states.
+          direction: a random direction with the same dimension as weights or states.
     """
 
     # random direction
     if dir_type == 'weights':
-        direction = get_random_weights(w)
-        normalize_directions_for_weights(direction, w, norm, ignore)
+        weights = get_weights(net) # a list of parameters.
+        direction = get_random_weights(weights)
+        normalize_directions_for_weights(direction, weights, norm, ignore)
     elif dir_type == 'states':
-        direction = get_random_states(s)
-        normalize_directions_for_states(direction, s, norm, ignore)
+        states = net.state_dict() # a dict of parameters, including BN's running mean/var.
+        direction = get_random_states(states)
+        normalize_directions_for_states(direction, states, norm, ignore)
 
     return direction
 
 
-def setup_direction(args, dir_file, w, s):
+def setup_direction(args, dir_file, net):
     """
         Setup the h5 file to store the directions.
         - xdirection, ydirection: The pertubation direction added to the mdoel.
           The direction is a list of tensors.
-        - xcoordinates, ycoordinates: the coorditnates at which to calculate values.
     """
-    # skip if the direction file already exists
+    print('-------------------------------------------------------------------')
+    print('setup_direction')
+    print('-------------------------------------------------------------------')
+    # Skip if the direction file already exists
     if exists(dir_file):
         f = h5py.File(dir_file, 'r')
         if (args.y and 'ydirection' in f.keys()) or 'xdirection' in f.keys():
             f.close()
             print ("%s is already setted up" % dir_file)
             return
+        f.close()
 
     # Create the plotting directions
-    f = h5py.File(dir_file,'w-') # create file, fail if exists
+    f = h5py.File(dir_file,'w') # create file, fail if exists
     if not args.dir_file:
         print("Setting up the plotting directions...")
         if args.model_file2:
             net2 = model_loader.load(args.dataset, args.model, args.model_file2)
-            xdirection = create_target_direction(w, s, net2, args.dir_type)
+            xdirection = create_target_direction(net, net2, args.dir_type)
         else:
             xdirection = create_random_direction(w, s, args.dir_type, args.xignore, args.xnorm)
         h5_util.write_list(f, 'xdirection', xdirection)
@@ -249,12 +250,13 @@ def setup_direction(args, dir_file, w, s):
                 ydirection = xdirection
             elif args.model_file3:
                 net3 = model_loader.load(args.dataset, args.model, args.model_file3)
-                ydirection = create_target_direction(w, s, net3, args.dir_type)
+                ydirection = create_target_direction(net, net3, args.dir_type)
             else:
                 ydirection = create_random_direction(w, s, args.dir_type, args.yignore, args.ynorm)
             h5_util.write_list(f, 'ydirection', ydirection)
 
     f.close()
+    print ("direction file created: %s" % dir_file)
 
 
 def name_direction_file(args):
@@ -311,8 +313,6 @@ def name_direction_file(args):
     if args.idx > 0: dir_file += '_idx=' + str(args.idx)
 
     dir_file += ".h5"
-
-    print ("direction file created: %s" % dir_file)
 
     return dir_file
 
