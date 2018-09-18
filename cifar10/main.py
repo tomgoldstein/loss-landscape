@@ -105,7 +105,7 @@ def test(testloader, net, criterion, use_cuda=True):
             one_hot_targets = one_hot_targets.float()
             if use_cuda:
                 inputs, one_hot_targets = inputs.cuda(), one_hot_targets.cuda()
-            inputs, one_hot_targets = Variable(inputs, volatile=True), Variable(one_hot_targets)
+            inputs, one_hot_targets = Variable(inputs), Variable(one_hot_targets)
             outputs = F.softmax(net(inputs))
             loss = criterion(outputs, one_hot_targets)
             test_loss += loss.item()*batch_size
