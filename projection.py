@@ -190,7 +190,7 @@ def setup_PCA_directions(args, model_files):
     # load models and prepare the optimization path matrix
     matrix = []
     for model_file in model_files:
-        print model_file
+        print (model_file)
         net2 = model_loader.load(args.dataset, args.model, model_file,
                                  args.data_parallel)
         if args.dir_type == 'weights':

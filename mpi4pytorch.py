@@ -17,7 +17,7 @@ def setup_MPI():
 
 def print_once(comm, *message):
     if not comm or comm.Get_rank()==0:
-        print ''.join(str(i) for i in message)
+        print (''.join(str(i) for i in message))
 
 def is_master(comm):
     return not comm or comm.Get_rank()==0
@@ -31,7 +31,7 @@ def allreduce_max(comm, array, display_info=False):
     total.fill(float_min)
 
     if display_info:
-        print "(%d): sum=%f : size=%d"%(get_rank(comm), np.sum(array), array.nbytes)
+        print ("(%d): sum=%f : size=%d"%(get_rank(comm), np.sum(array), array.nbytes))
         rows = str(comm.gather(array.shape[0]))
         cols = str(comm.gather(array.shape[1]))
         print_once(comm, "reduce: %s, %s"%(rows, cols))
@@ -48,7 +48,7 @@ def allreduce_min(comm, array, display_info=False):
     total.fill(float_max)
 
     if display_info:
-        print "(%d): sum=%f : size=%d"%(get_rank(comm), np.sum(array), array.nbytes)
+        print ("(%d): sum=%f : size=%d"%(get_rank(comm), np.sum(array), array.nbytes))
         rows = str(comm.gather(array.shape[0]))
         cols = str(comm.gather(array.shape[1]))
         print_once(comm, "reduce: %s, %s"%(rows, cols))
@@ -66,7 +66,7 @@ def reduce_max(comm, array, display_info=False):
     total.fill(float_min)
 
     if display_info:
-        print "(%d): sum=%f : size=%d"%(get_rank(comm), np.sum(array), array.nbytes)
+        print ("(%d): sum=%f : size=%d"%(get_rank(comm), np.sum(array), array.nbytes))
         rows = str(comm.gather(array.shape[0]))
         cols = str(comm.gather(array.shape[1]))
         print_once(comm, "reduce: %s, %s"%(rows, cols))
@@ -83,7 +83,7 @@ def reduce_min(comm, array, display_info=False):
     total.fill(float_max)
 
     if display_info:
-        print "(%d): sum=%f : size=%d"%(get_rank(comm), np.sum(array), array.nbytes)
+        print ("(%d): sum=%f : size=%d"%(get_rank(comm), np.sum(array), array.nbytes))
         rows = str(comm.gather(array.shape[0]))
         cols = str(comm.gather(array.shape[1]))
         print_once(comm, "reduce: %s, %s"%(rows, cols))
