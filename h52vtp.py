@@ -247,13 +247,13 @@ def h5_to_vtp(surf_file, surf_name='train_loss', log=False, zmax=-1, interp=-1):
     print("Done with file:{}".format(vtp_file))
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Convert h5 file to VTK file in XML that can be opened with ParaView')
-    parser.add_argument('--file', '-f', default='', help='The h5 file that contains surface values')
+    parser = argparse.ArgumentParser(description='Convert h5 file to XML-based VTK file that can be opened with ParaView')
+    parser.add_argument('--surf_file', '-f', default='', help='The h5 file that contains surface values')
     parser.add_argument('--surf_name', default='train_loss',
-		help='The type of surface to plot: train_loss | test_loss | train_acc | test_acc | train_err | test_err')
+		help='The type of surface to plot: train_loss | test_loss | train_acc | test_acc ')
     parser.add_argument('--zmax', default=-1, type=float, help='Maximum z value to map')
     parser.add_argument('--interp', default=-1, type=int, help='Interpolate the surface to this resolution (1000 recommended)')
     parser.add_argument('--log', action='store_true', default=False, help='log scale')
     args = parser.parse_args()
 
-    h5_to_vtp(args.file, args.surf_name, log=args.log, zmax=args.zmax, interp=args.interp)
+    h5_to_vtp(args.surf_file, args.surf_name, log=args.log, zmax=args.zmax, interp=args.interp)
