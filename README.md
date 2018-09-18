@@ -30,17 +30,20 @@ No data augmentation (random cropping or horizontal flipping) is used in calcula
 
 ## Visualizing 1D loss curve
 
-### 1D Linear interpolation
-The traditional 1D linear interpolation method evaluates the loss values along the direction between two solutions of the same network.
+### 1D linear interpolation
+The 1D linear interpolation method [1] evaluates the loss values along the direction between two solutions of the same network. It was used to compare the flatness of minimizers trained with different batch sizes [2].
 
 ```
 mpirun -n 4 python plot_surface.py --mpi --cuda --model vgg9 --x=-0.5:1.5:401 --dir_type states \
 --model_file cifar10/trained_nets/vgg9_sgd_lr=0.1_bs=128_wd=0.0_save_epoch=1/model_300.t7 \
 --model_file2 cifar10/trained_nets/vgg9_sgd_lr=0.1_bs=8192_wd=0.0_save_epoch=1/model_300.t7
 ```
+- `--x=-0.5:1.5:401` sets the range of step size and the number of sampling points to be 401.
 - `--dir_type states` indicates the direction contains dimensions for all parameters as well as the statistics of the BN layers (`running_mean` and `running_var`). Note that ignoring `running_mean` and `running_var` can not produce correct loss values when plotting two solutions in the same figure.
 
-![VGG-9 SGD, WD=0](doc/images/vgg9_sgd_lr=0.1_bs=128_wd=0_300.t7_vgg9_sgd_lr=0.1_bs=8192_wd=0_300.t7_states_[-0.5,1.5,401].h5_1d_loss_err.jpg)
+![VGG-9 SGD, WD=0](doc/images/vgg9_sgd_lr=0.1_bs=128_wd=0.0_save_epoch=1_model_300.t7_vgg9_sgd_lr=0.1_bs=8192_wd=0.0_save_epoch=1_model_300.t7_states.h5_[-1.0,1.0,401].h5_1d_loss_acc.jpg)
+
+
 
 ### Random normalized direction
 A random direction with the same dimension as the model parameters is created and normalized in the filter level.
@@ -51,13 +54,14 @@ mpirun -n 4 python plot_surface.py --mpi --cuda --model vgg9 --x=-1:1:51 \
 --model_file cifar10/trained_nets/vgg9_sgd_lr=0.1_bs=128_wd=0.0_save_epoch=1/model_300.t7 \
 --dir_type weights --xnorm filter --xignore biasbn
 ```
- - `--x=-1:1:51` sets the range of step size and the number of sampling points to be 51.
  - `--dir_type weights` indicates the direction has the same dimensions as the learned parameters, including bias and parameters in the BN layers.
- - `--xnorm filter` normalizes the random direction in the filter level. Here the filter refers to weights that generate one neuron.
+ - `--xnorm filter` normalizes the random direction in the filter level. Here the filter refers to weights that generate one neuron, which also applies to full-connected layers.
  - `--xignore biasbn` ignores the direction corresponding to bias and BN parameters (set to zeros).
 
 
- ![VGG-9 SGD, WD=0](doc/images/vgg9_sgd_lr=0.1_bs=128_wd=0_300.t7_states_ignore=biasbn_norm=filter_[-1.0,1.0,51].h5_1d_loss_err.jpg)
+ ![VGG-9 SGD, WD=0](doc/images/vgg9_sgd_lr=0.1_bs=128_wd=0.0_save_epoch=1/model_300.t7_weights_xignore=biasbn_xnorm=filter.h5_[-1.0,1.0,51].h5_1d_loss_acc.jpg)
+
+
 
 We can also customize the 1D plots with `plot_1D.py` once the surface file is available.
 
@@ -77,30 +81,33 @@ mpirun -n 4 python plot_surface.py --model resnet56 --x=-1:1:51 --y=-1:1:51 \
 We can also customize the plots given a surface `.h5` file with `plot_2D.py`.
 
 ```
-python plot_2D.py --surf_file path_to_surface_file --surface_name train_loss
+python plot_2D.py --surf_file path_to_surf_file --surf_name train_loss
 ```
-- `--surface_name` specifies the type of surface. The default choice is `train_loss`,
+- `--surf_name` specifies the type of surface. The default choice is `train_loss`,
 - `--vmin` and `--vmax` sets the range of values to be plotted.
 - `--vlevel` sets the step of the contours.
 
 
 ## Visualizing 3D loss surface
-`plot_2D.py` produces a basic 3D loss surface with `matplotlib`.
-You may also want to render the 3D surface with [ParaView](http://paraview.org).
+`plot_2D.py` can make a basic 3D loss surface plot with `matplotlib`.
+You can also render the loss surface with [ParaView](http://paraview.org).
 
-|![ResNet-56-noshort](doc/images/resnet56_noshort_small.jpg)| ![ResNet-56](doc/images/resnet56_small.jpg)|
-|:----------:|:-------------:|
-|*ResNet-56-noshort*|*ResNet-56*|
+![ResNet-56-noshort](doc/images/resnet56_noshort_small.jpg) ![ResNet-56](doc/images/resnet56_small.jpg)
 
 
 1. Convert the surface `.h5` file to the `.vtp` file.
 ```
-python h52vtp.py --file path_to_surface_file --surf_name train_loss --zmax  10 --log
+python h52vtp.py --file path_to_surf_file --surf_name train_loss --zmax  10 --log
 ```
-which will generate a [VTK](https://www.kitware.com/products/books/VTKUsersGuide.pdf) file containing the loss surface with max value 10 in the log scale.
+   It will generate a [VTK](https://www.kitware.com/products/books/VTKUsersGuide.pdf) file containing the loss surface with max value 10 in the log scale.
 
 2. Open the `.vtp` file with ParaView. In ParaView, open the `.vtp` file with the VTK reader. Click the eye icon in the `Pipeline Browser` to make the figure show up. You can drag the surface around, and change the colors in the `Properties` window.  `Save screenshot` in the File menu saves the image, which can be cropped elsewhere.
 
+## Reference
+
+[1] Ian J Goodfellow, Oriol Vinyals, and Andrew M Saxe. Qualitatively characterizing neural network optimization problems. ICLR, 2015.
+
+[2] Nitish Shirish Keskar, Dheevatsa Mudigere, Jorge Nocedal, Mikhail Smelyanskiy, and Ping Tak Peter Tang. On large-batch training for deep learning: Generalization gap and sharp minima. ICLR, 2017.
 
 ## Citation
 If you find this code useful in your research, please cite:
