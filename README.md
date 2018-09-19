@@ -21,8 +21,12 @@ The direction(s) and the surface values are stored in HDF5 (`.h5`) files.
 **Pre-trained models**:
 The code accepts pre-trained PyTorch models for CIFAR-10 dataset.
 To load the pre-trained model correctly, the model file should contain `state_dict`, which is saved from the `state_dict()` method.
-The default path for pre-trained networks is `cifar10/trained_nets/`.
-Some of the pre-trained models and plotted figures can be downloaded [here](http://www.cs.umd.edu/~haoli/projects/landscape/trained_net.tar.gz) (464 MB).
+The default path for pre-trained networks is `cifar10/trained_nets`.
+Some of the pre-trained models and plotted figures can be downloaded here:
+- [VGG-9](https://drive.google.com/open?id=1jikD79HGbp6mN1qSGojsXOZEM5VAq3tH) (349 MB)
+- [ResNet-56](https://drive.google.com/a/cs.umd.edu/file/d/12oxkvfaKcPyyHiOevVNTBzaQ1zAFlNPX/view?usp=sharing) (10 MB)
+- [ResNet-56-noshort](https://drive.google.com/a/cs.umd.edu/file/d/1eUvYy3HaiCVHTzi3MHEZGgrGOPACLMkR/view?usp=sharing) (20 MB)
+- [DenseNet-121](https://drive.google.com/a/cs.umd.edu/file/d/1oU0nDFv9CceYM4uW6RcOULYS-rnWxdVl/view?usp=sharing) (75 MB)
 
 **Data preprocessing**:
 The data normalization method for visualization should be consistent with the one used for model training.
@@ -76,7 +80,7 @@ mpirun -n 4 python plot_surface.py --model resnet56 --x=-1:1:51 --y=-1:1:51 \
 --mpi --cuda --dir_type weights --xnorm filter --xignore biasbn --ynorm filter --yignore biasbn
 ```
 
-![ResNet-56](doc/images/resnet56_random_[-1.0,1.0]x[-1.0,1.0].h5_2dcontour.jpg)
+![ResNet-56](doc/images/resnet56_sgd_lr=0.1_bs=128_wd=0.0005/model_300.t7_weights_xignore=biasbn_xnorm=filter_yignore=biasbn_ynorm=filter.h5_[-1.0,1.0,51]x[-1.0,1.0,51].h5_train_loss_2dcontour.jpg)
 
 We can also customize the plots given a surface `.h5` file with `plot_2D.py`.
 
