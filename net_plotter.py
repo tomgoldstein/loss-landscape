@@ -242,7 +242,7 @@ def setup_direction(args, dir_file, net):
             net2 = model_loader.load(args.dataset, args.model, args.model_file2)
             xdirection = create_target_direction(net, net2, args.dir_type)
         else:
-            xdirection = create_random_direction(w, s, args.dir_type, args.xignore, args.xnorm)
+            xdirection = create_random_direction(net, args.dir_type, args.xignore, args.xnorm)
         h5_util.write_list(f, 'xdirection', xdirection)
 
         if args.y:
@@ -252,7 +252,7 @@ def setup_direction(args, dir_file, net):
                 net3 = model_loader.load(args.dataset, args.model, args.model_file3)
                 ydirection = create_target_direction(net, net3, args.dir_type)
             else:
-                ydirection = create_random_direction(w, s, args.dir_type, args.yignore, args.ynorm)
+                ydirection = create_random_direction(net, args.dir_type, args.yignore, args.ynorm)
             h5_util.write_list(f, 'ydirection', ydirection)
 
     f.close()
