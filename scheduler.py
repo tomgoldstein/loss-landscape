@@ -45,7 +45,7 @@ def split_inds(num_inds, nproc):
         MPI processes.
     """
 
-    chunk = num_inds / nproc
+    chunk = num_inds // nproc
     remainder = num_inds % nproc
     splitted_idx = []
     for rank in range(0, nproc):
