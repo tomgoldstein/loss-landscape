@@ -218,85 +218,85 @@ def ResNet152_noshort():
 # CIFAR-10 models
 def ResNet20():
     depth = 20
-    n = (depth - 2) / 6
+    n = (depth - 2) // 6
     return ResNet_cifar(BasicBlock, [n,n,n])
 
 def ResNet20_noshort():
     depth = 20
-    n = (depth - 2) / 6
+    n = (depth - 2) // 6
     return ResNet_cifar(BasicBlock_noshortcut, [n,n,n])
 
 def ResNet32_noshort():
     depth = 32
-    n = (depth - 2) / 6
+    n = (depth - 2) // 6
     return ResNet_cifar(BasicBlock_noshortcut, [n,n,n])
 
 def ResNet44_noshort():
     depth = 44
-    n = (depth - 2) / 6
+    n = (depth - 2) // 6
     return ResNet_cifar(BasicBlock_noshortcut, [n,n,n])
 
 def ResNet50_16_noshort():
     depth = 50
-    n = (depth - 2) / 6
+    n = (depth - 2) // 6
     return ResNet_cifar(BasicBlock_noshortcut, [n,n,n])
 
 def ResNet56():
     depth = 56
-    n = (depth - 2) / 6
+    n = (depth - 2) // 6
     return ResNet_cifar(BasicBlock, [n,n,n])
 
 def ResNet56_noshort():
     depth = 56
-    n = (depth - 2) / 6
+    n = (depth - 2) // 6
     return ResNet_cifar(BasicBlock_noshortcut, [n,n,n])
 
 def ResNet110():
     depth = 110
-    n = (depth - 2) / 6
+    n = (depth - 2) // 6
     return ResNet_cifar(BasicBlock, [n,n,n])
 
 def ResNet110_noshort():
     depth = 110
-    n = (depth - 2) / 6
+    n = (depth - 2) // 6
     return ResNet_cifar(BasicBlock_noshortcut, [n,n,n])
 
 def WRN56_2():
     depth = 56
-    n = (depth - 2) / 6
+    n = (depth - 2) // 6
     return WResNet_cifar(BasicBlock, [n,n,n], 2)
 
 def WRN56_4():
     depth = 56
-    n = (depth - 2) / 6
+    n = (depth - 2) // 6
     return WResNet_cifar(BasicBlock, [n,n,n], 4)
 
 def WRN56_8():
     depth = 56
-    n = (depth - 2) / 6
+    n = (depth - 2) // 6
     return WResNet_cifar(BasicBlock, [n,n,n], 8)
 
 def WRN56_2_noshort():
     depth = 56
-    n = (depth - 2) / 6
+    n = (depth - 2) // 6
     return WResNet_cifar(BasicBlock_noshortcut, [n,n,n], 2)
 
 def WRN56_4_noshort():
     depth = 56
-    n = (depth - 2) / 6
+    n = (depth - 2) // 6
     return WResNet_cifar(BasicBlock_noshortcut, [n,n,n], 4)
 
 def WRN56_8_noshort():
     depth = 56
-    n = (depth - 2) / 6
+    n = (depth - 2) // 6
     return WResNet_cifar(BasicBlock_noshortcut, [n,n,n], 8)
 
 def WRN110_2_noshort():
     depth = 110
-    n = (depth - 2) / 6
+    n = (depth - 2) // 6
     return WResNet_cifar(BasicBlock_noshortcut, [n,n,n], 2)
 
 def WRN110_4_noshort():
     depth = 110
-    n = (depth - 2) / 6
+    n = (depth - 2) // 6
     return WResNet_cifar(BasicBlock_noshortcut, [n,n,n], 4)

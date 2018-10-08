@@ -16,6 +16,10 @@ import seaborn as sns
 
 def plot_2d_contour(surf_file, surf_name='train_loss', vmin=0.1, vmax=10, vlevel=0.5, show=False):
     """Plot 2D contours and 3D surface."""
+    print('------------------------------------------------------------------')
+    print('plot_2d_contour')
+    print('------------------------------------------------------------------')
+    print("loading surface file: " + surf_file)
 
     f = h5py.File(surf_file, 'r')
     x = np.array(f['xcoordinates'][:])
@@ -27,12 +31,8 @@ def plot_2d_contour(surf_file, surf_name='train_loss', vmin=0.1, vmax=10, vlevel
     elif surf_name == 'train_err' or surf_name == 'test_err' :
         Z = 100 - np.array(f[surf_name][:])
     else:
-        print ('%s is not found in %s' % (surf_name, surf_file))
+        print('%s is not found in %s' % (surf_name, surf_file))
 
-    print('------------------------------------------------------------------')
-    print('plot_2d_contour')
-    print('------------------------------------------------------------------')
-    print("loading " + surf_file)
     print('len(xcoordinates): %d   len(ycoordinates): %d' % (len(x), len(y)))
     print('max(%s) = %f \t min(%s) = %f' % (surf_name, np.max(Z), surf_name, np.min(Z)))
     print(Z)

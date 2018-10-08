@@ -12,18 +12,18 @@ def plot_1d_loss_err(surf_file, xmin=-1.0, xmax=1.0, loss_max=5, log=False, show
     print('------------------------------------------------------------------')
     print('plot_1d_loss_err')
     print('------------------------------------------------------------------')
+    print("loading surface file: " + surf_file)
 
     f = h5py.File(surf_file,'r')
-    print f.keys()
     x = f['xcoordinates'][:]
     assert 'train_loss' in f.keys(), "'train_loss' does not exist"
     train_loss = f['train_loss'][:]
     train_acc = f['train_acc'][:]
 
-    print ("train_loss")
-    print (train_loss)
-    print ("train_acc")
-    print (train_acc)
+    print("train_loss")
+    print(train_loss)
+    print("train_acc")
+    print(train_acc)
 
     xmin = xmin if xmin != -1.0 else min(x)
     xmax = xmax if xmax != 1.0 else max(x)
