@@ -55,7 +55,7 @@ def load_dataset(dataset='cifar10', datapath='cifar10/data', batch_size=128, \
                                                 download=True, transform=transform)
         if data_split > 1:
             indices = torch.tensor(np.arange(len(trainset)))
-            data_num = len(trainset)/data_split
+            data_num = len(trainset) // data_split
             ind_start = data_num*split_idx
             ind_end = min(data_num*(split_idx + 1), len(trainset))
             train_indices = indices[ind_start:ind_end]
