@@ -15,11 +15,7 @@ import seaborn as sns
 
 
 def plot_2d_contour(surf_file, surf_name='train_loss', vmin=0.1, vmax=10, vlevel=0.5, show=False):
-    """Plot 2D contours and 3D surface."""
-    print('------------------------------------------------------------------')
-    print('plot_2d_contour')
-    print('------------------------------------------------------------------')
-    print("loading surface file: " + surf_file)
+    """Plot 2D contour map and 3D surface."""
 
     f = h5py.File(surf_file, 'r')
     x = np.array(f['xcoordinates'][:])
@@ -31,8 +27,12 @@ def plot_2d_contour(surf_file, surf_name='train_loss', vmin=0.1, vmax=10, vlevel
     elif surf_name == 'train_err' or surf_name == 'test_err' :
         Z = 100 - np.array(f[surf_name][:])
     else:
-        print('%s is not found in %s' % (surf_name, surf_file))
+        print ('%s is not found in %s' % (surf_name, surf_file))
 
+    print('------------------------------------------------------------------')
+    print('plot_2d_contour')
+    print('------------------------------------------------------------------')
+    print("loading surface file: " + surf_file)
     print('len(xcoordinates): %d   len(ycoordinates): %d' % (len(x), len(y)))
     print('max(%s) = %f \t min(%s) = %f' % (surf_name, np.max(Z), surf_name, np.min(Z)))
     print(Z)
@@ -79,7 +79,7 @@ def plot_2d_contour(surf_file, surf_name='train_loss', vmin=0.1, vmax=10, vlevel
     if show: plt.show()
 
 
-def plot_trajectory(proj_file, dir_file, noshow=True):
+def plot_trajectory(proj_file, dir_file, show=False):
     """ Plot optimization trajectory on the plane spanned by given directions."""
 
     assert exists(proj_file), 'Projection file does not exist.'
@@ -103,8 +103,8 @@ def plot_trajectory(proj_file, dir_file, noshow=True):
     if show: plt.show()
 
 
-def plot_contour_trajectory(surf_file, dir_file, proj_file, surf_name='train_loss',
-                            vmin=0.1, vmax=10, vlevel=0.5, noshow=True):
+def plot_contour_trajectory(surf_file, dir_file, proj_file, surf_name='loss_vals',
+                            vmin=0.1, vmax=10, vlevel=0.5, show=False):
     """2D contour + trajectory"""
 
     assert exists(surf_file) and exists(proj_file) and exists(dir_file)
