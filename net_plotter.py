@@ -156,6 +156,12 @@ def normalize_directions_for_states(direction, states, norm='filter', ignore='ig
             normalize_direction(d, w, norm)
 
 
+def ignore_biasbn(directions):
+    """ Set bias and bn parameters in directions to zero """
+    for d in directions:
+        if d.dim() <= 1:
+            d.fill_(0)
+
 ################################################################################
 #                       Create directions
 ################################################################################
@@ -327,6 +333,5 @@ def load_directions(dir_file):
         directions = [xdirection, ydirection]
     else:
         directions = [h5_util.read_list(f, 'xdirection')]
-    # f.close()
 
     return directions

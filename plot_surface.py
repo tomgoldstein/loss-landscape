@@ -93,7 +93,6 @@ def crunch(surf_file, net, w, s, d, dataloader, loss_key, acc_key, comm, rank, a
         losses = f[loss_key][:]
         accuracies = f[acc_key][:]
 
-
     # Generate a list of indices of 'losses' that need to be filled in.
     # The coordinates of each unfilled index (with respect to the direction vectors
     # stored in 'd') are stored in 'coords'.
@@ -158,7 +157,7 @@ def crunch(surf_file, net, w, s, d, dataloader, loss_key, acc_key, comm, rank, a
 #                          MAIN
 ###############################################################
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
+    parser = argparse.ArgumentParser(description='plotting loss surface')
     parser.add_argument('--mpi', '-m', action='store_true', help='use mpi')
     parser.add_argument('--cuda', '-c', action='store_true', help='use cuda')
     parser.add_argument('--threads', default=2, type=int, help='number of threads')
@@ -267,8 +266,8 @@ if __name__ == '__main__':
     d = net_plotter.load_directions(dir_file)
     # calculate the consine similarity of the two directions
     if len(d) == 2 and rank == 0:
-        similarity = proj.cal_angle(proj.list_to_vec(d[0]), proj.list_to_vec(d[1]))
-        print('cosine similarity between x-axis and y-axis: ' + str(similarity))
+        similarity = proj.cal_angle(proj.nplist_to_tensor(d[0]), proj.nplist_to_tensor(d[1]))
+        print('cosine similarity between x-axis and y-axis: %f' % similarity)
 
     #--------------------------------------------------------------------------
     # Setup dataloader
