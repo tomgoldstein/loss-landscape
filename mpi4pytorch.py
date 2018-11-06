@@ -53,7 +53,7 @@ def allreduce_min(comm, array, display_info=False):
         cols = str(comm.gather(array.shape[1]))
         print_once(comm, "reduce: %s, %s"%(rows, cols))
 
-    comm.Allreduce(array, total, op=MPI.MAX)
+    comm.Allreduce(array, total, op=MPI.MIN)
     return total
 
 
