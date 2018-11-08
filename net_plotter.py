@@ -122,7 +122,7 @@ def normalize_direction(direction, weights, norm='filter'):
         # Rescale the entries in the direction so that each filter direction
         # has the unit norm.
         for d in direction:
-            d.div_(d.ngorm() + 1e-10)
+            d.div_(d.norm() + 1e-10)
     elif norm == 'dlayer':
         # Rescale the entries in the direction so that each layer direction has
         # the unit norm.
