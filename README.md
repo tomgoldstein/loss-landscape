@@ -104,7 +104,7 @@ If you want a more detailed rendering that uses lighting to display details, you
 To do this, you must
 1. Convert the surface `.h5` file to a `.vtp` file.
 ```
-python h52vtp.py --file path_to_surf_file --surf_name train_loss --zmax  10 --log
+python h52vtp.py --surf_file path_to_surf_file --surf_name train_loss --zmax  10 --log
 ```
    This will generate a [VTK](https://www.kitware.com/products/books/VTKUsersGuide.pdf) file containing the loss surface with max value 10 in the log scale.
 
