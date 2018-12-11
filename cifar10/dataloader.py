@@ -6,10 +6,10 @@ import torchvision.transforms as transforms
 
 def get_data_loaders(args):
     if args.trainloader and args.testloader:
-        assert os.path.exists(trainloader_path), 'trainloader does not exist'
-        assert os.path.exists(testloader_path), 'testloader does not exist'
-        trainloader = torch.load(trainloader_path)
-        testloader = torch.load(testloader_path)
+        assert os.path.exists(args.trainloader), 'trainloader does not exist'
+        assert os.path.exists(args.testloader), 'testloader does not exist'
+        trainloader = torch.load(args.trainloader)
+        testloader = torch.load(args.testloader)
         return trainloader, testloader
 
     normalize = transforms.Normalize(mean=[x/255.0 for x in [125.3, 123.0, 113.9]],
