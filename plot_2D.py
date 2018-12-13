@@ -45,13 +45,14 @@ def plot_2d_contour(surf_file, surf_name='train_loss', vmin=0.1, vmax=10, vlevel
     # Plot 2D contours
     # --------------------------------------------------------------------
     fig = plt.figure()
-    CS = plt.contour(X, Y, Z, cmpa='summer', levels=np.arange(vmin, vmax, vlevel))
+    CS = plt.contour(X, Y, Z, cmap='summer', levels=np.arange(vmin, vmax, vlevel))
     plt.clabel(CS, inline=1, fontsize=8)
     fig.savefig(surf_file + '_' + surf_name + '_2dcontour' + '.pdf', dpi=300,
                 bbox_inches='tight', format='pdf')
 
     fig = plt.figure()
-    CS = plt.contourf(X, Y, Z, cmpa='summer', levels=np.arange(vmin, vmax, vlevel))
+    print(surf_file + '_' + surf_name + '_2dcontourf' + '.pdf')
+    CS = plt.contourf(X, Y, Z, cmap='summer', levels=np.arange(vmin, vmax, vlevel))
     fig.savefig(surf_file + '_' + surf_name + '_2dcontourf' + '.pdf', dpi=300,
                 bbox_inches='tight', format='pdf')
 
