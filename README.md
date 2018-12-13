@@ -15,7 +15,7 @@ The random direction(s) and loss surface values are stored in HDF5 (`.h5`) files
 - [openmpi 3.1.2](https://www.open-mpi.org/)
 - [mpi4py 2.0.0](https://mpi4py.scipy.org/docs/usrman/install.html)
 - [numpy 1.15.1](https://docs.scipy.org/doc/numpy/user/quickstart.html)  
-- [h5py 2.8.0](http://docs.h5py.org/en/stable/build.html#install)
+- [h5py 2.7.0](http://docs.h5py.org/en/stable/build.html#install)
 - [matplotlib 2.0.2](https://matplotlib.org/users/installing.html)
 - [scipy 0.19](https://www.scipy.org/install.html)
 
