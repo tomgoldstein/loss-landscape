@@ -1,5 +1,9 @@
+"""                                              mpi4pytorch.py
+ This module contains convenience methods that make it easy to use mpi4py.  The available functions handle memory
+ allocation and other data formatting tasks so that tensors can be easily reduced/broadcast using 1 line of code.
+"""
+
 import numpy as np
-import torch
 from mpi4py import MPI
 
 def setup_MPI():

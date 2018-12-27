@@ -14,7 +14,6 @@ import sys
 import numpy as np
 import torchvision
 import torch.nn as nn
-import mpi4pytorch
 import dataloader
 import evaluation
 import projection as proj
@@ -53,7 +52,7 @@ def setup_surface_file(args, surf_file, dir_file):
         f = h5py.File(surf_file, 'r')
         if (args.y and 'ycoordinates' in f.keys()) or 'xcoordinates' in f.keys():
             f.close()
-            print ("%s is already setted up" % surf_file)
+            print ("%s is already set up" % surf_file)
             return
 
     f = h5py.File(surf_file, 'a')
@@ -211,9 +210,11 @@ if __name__ == '__main__':
     # Environment setup
     #--------------------------------------------------------------------------
     if args.mpi:
+        import mpi4pytorch
         comm = mpi4pytorch.setup_MPI()
         rank, nproc = comm.Get_rank(), comm.Get_size()
     else:
+        import mpi4pytorch_placeholder
         comm, rank, nproc = None, 0, 1
 
     # in case of multiple GPUs per node, set the GPU to use for each rank
