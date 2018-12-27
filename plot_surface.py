@@ -127,8 +127,8 @@ def crunch(surf_file, net, w, s, d, dataloader, loss_key, acc_key, comm, rank, a
 
         # Send updated plot data to the master node
         syc_start = time.time()
-        losses     = mpi4pytorch.reduce_max(comm, losses)
-        accuracies = mpi4pytorch.reduce_max(comm, accuracies)
+        losses     = mpi.reduce_max(comm, losses)
+        accuracies = mpi.reduce_max(comm, accuracies)
         syc_time = time.time() - syc_start
         total_sync += syc_time
 
@@ -144,8 +144,8 @@ def crunch(surf_file, net, w, s, d, dataloader, loss_key, acc_key, comm, rank, a
     # This is only needed to make MPI run smoothly. If this process has less work than
     # the rank0 process, then we need to keep calling reduce so the rank0 process doesn't block
     for i in range(max(inds_nums) - len(inds)):
-        losses = mpi4pytorch.reduce_max(comm, losses)
-        accuracies = mpi4pytorch.reduce_max(comm, accuracies)
+        losses = mpi.reduce_max(comm, losses)
+        accuracies = mpi.reduce_max(comm, accuracies)
 
     total_time = time.time() - start_time
     print('Rank %d done!  Total time: %.2f Sync: %.2f' % (rank, total_time, total_sync))
@@ -210,11 +210,11 @@ if __name__ == '__main__':
     # Environment setup
     #--------------------------------------------------------------------------
     if args.mpi:
-        import mpi4pytorch
-        comm = mpi4pytorch.setup_MPI()
+        import mpi4pytorch as mpi
+        comm = mpi.setup_MPI()
         rank, nproc = comm.Get_rank(), comm.Get_size()
     else:
-        import mpi4pytorch_placeholder
+        import mpi4pytorch_placeholder as mpi
         comm, rank, nproc = None, 0, 1
 
     # in case of multiple GPUs per node, set the GPU to use for each rank
@@ -261,7 +261,7 @@ if __name__ == '__main__':
         setup_surface_file(args, surf_file, dir_file)
 
     # wait until master has setup the direction file and surface file
-    mpi4pytorch.barrier(comm)
+    mpi.barrier(comm)
 
     # load directions
     d = net_plotter.load_directions(dir_file)
@@ -277,7 +277,7 @@ if __name__ == '__main__':
     if rank == 0 and args.dataset == 'cifar10':
         torchvision.datasets.CIFAR10(root=args.dataset + '/data', train=True, download=True)
 
-    mpi4pytorch.barrier(comm)
+    mpi.barrier(comm)
 
     trainloader, testloader = dataloader.load_dataset(args.dataset, args.datapath,
                                 args.batch_size, args.threads, args.raw_data,
