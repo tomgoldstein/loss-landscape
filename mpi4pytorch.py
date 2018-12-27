@@ -1,9 +1,9 @@
 import numpy as np
 import torch
-from mpi4py import MPI
 
 def setup_MPI():
     try:
+        from mpi4py import MPI
         comm = MPI.COMM_WORLD
         #  Convert the Object to a Class so that it is possible to add attributes later
         class A(MPI.Intracomm):
