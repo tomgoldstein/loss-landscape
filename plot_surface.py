@@ -22,7 +22,7 @@ import plot_2D
 import plot_1D
 import model_loader
 import scheduler
-
+import mpi4pytorch as mpi
 
 def name_surface_file(args, dir_file):
     # skip if surf_file is specified in args
@@ -210,11 +210,9 @@ if __name__ == '__main__':
     # Environment setup
     #--------------------------------------------------------------------------
     if args.mpi:
-        import mpi4pytorch as mpi
         comm = mpi.setup_MPI()
         rank, nproc = comm.Get_rank(), comm.Get_size()
     else:
-        import mpi4pytorch_placeholder as mpi
         comm, rank, nproc = None, 0, 1
 
     # in case of multiple GPUs per node, set the GPU to use for each rank
