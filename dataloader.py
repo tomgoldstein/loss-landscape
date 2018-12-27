@@ -53,13 +53,19 @@ def load_dataset(dataset='cifar10', datapath='cifar10/data', batch_size=128, \
 
         trainset = torchvision.datasets.CIFAR10(root=data_folder, train=True,
                                                 download=True, transform=transform)
+        # If data_split>1, then randomly select a subset of the data. E.g., if datasplit=3, then
+        # randomly choose 1/3 of the data.
         if data_split > 1:
             indices = torch.tensor(np.arange(len(trainset)))
-            data_num = len(trainset) // data_split
-            ind_start = data_num*split_idx
-            ind_end = min(data_num*(split_idx + 1), len(trainset))
-            train_indices = indices[ind_start:ind_end]
-            train_sampler = torch.utils.data.sampler.SubsetRandomSampler(train_indices)
+            data_num = len(trainset) // data_split # the number of data in a chunk of the split
+
+            # Randomly sample indices. Use seed=0 in the generator to make this reproducible
+            state = np.random.get_state()
+            np.random.seed(0)
+            indices = np.random.choice(indices, data_num, replace=False)
+            np.random.set_state(state)
+
+            train_sampler = torch.utils.data.sampler.SubsetRandomSampler(indices)
             train_loader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
                                                        sampler=train_sampler,
                                                        shuffle=False, num_workers=threads)
