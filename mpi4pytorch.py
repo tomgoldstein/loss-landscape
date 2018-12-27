@@ -4,13 +4,15 @@
 """
 
 import numpy as np
-from mpi4py import MPI
+import mpi4py
 
 def setup_MPI():
+    print('SETUP MPI')
     try:
+        from mpi4py import MPI
         comm = MPI.COMM_WORLD
         #  Convert the Object to a Class so that it is possible to add attributes later
-        class A(MPI.Intracomm):
+        class A(mpi4py.MPI.Intracomm):
             pass
         comm = A(comm)
     except:
@@ -40,7 +42,7 @@ def allreduce_max(comm, array, display_info=False):
         cols = str(comm.gather(array.shape[1]))
         print_once(comm, "reduce: %s, %s"%(rows, cols))
 
-    comm.Allreduce(array, total, op=MPI.MAX)
+    comm.Allreduce(array, total, op=mpi4py.MPI.MAX)
     return total
 
 def allreduce_min(comm, array, display_info=False):
@@ -57,7 +59,7 @@ def allreduce_min(comm, array, display_info=False):
         cols = str(comm.gather(array.shape[1]))
         print_once(comm, "reduce: %s, %s"%(rows, cols))
 
-    comm.Allreduce(array, total, op=MPI.MIN)
+    comm.Allreduce(array, total, op=mpi4py.MPI.MIN)
     return total
 
 
@@ -75,7 +77,7 @@ def reduce_max(comm, array, display_info=False):
         cols = str(comm.gather(array.shape[1]))
         print_once(comm, "reduce: %s, %s"%(rows, cols))
 
-    comm.Reduce(array, total, op=MPI.MAX, root=0)
+    comm.Reduce(array, total, op=mpi4py.MPI.MAX, root=0)
     return total
 
 def reduce_min(comm, array, display_info=False):
@@ -92,7 +94,7 @@ def reduce_min(comm, array, display_info=False):
         cols = str(comm.gather(array.shape[1]))
         print_once(comm, "reduce: %s, %s"%(rows, cols))
 
-    comm.Reduce(array, total, op=MPI.MIN, root=0)
+    comm.Reduce(array, total, op=mpi4py.MPI.MIN, root=0)
     return total
 
 def barrier(comm):
@@ -102,7 +104,7 @@ def barrier(comm):
 
 def get_mpi_info():
     try:
-        return MPI.get_vendor()
+        return mpi4py.MPI.get_vendor()
     except ImportError:
         return "none"
 
