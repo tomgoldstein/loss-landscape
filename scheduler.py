@@ -1,5 +1,5 @@
 """
-    A task scheduler that assign unfinished jobs to differnt workers.
+    A task scheduler that assign unfinished jobs to different workers.
 """
 import numpy as np
 

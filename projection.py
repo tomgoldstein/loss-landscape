@@ -6,7 +6,6 @@ import numpy as np
 import torch
 import os
 import copy
-import math
 import h5py
 import net_plotter
 import model_loader

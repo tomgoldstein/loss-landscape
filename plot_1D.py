@@ -6,7 +6,6 @@ from matplotlib import pyplot as pp
 import h5py
 import argparse
 import numpy as np
-import os
 
 def plot_1d_loss_err(surf_file, xmin=-1.0, xmax=1.0, loss_max=5, log=False, show=False):
     print('------------------------------------------------------------------')

@@ -5,8 +5,6 @@
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import pyplot as plt
 from matplotlib import cm
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
-from matplotlib.colors import LogNorm
 import h5py
 import argparse
 import numpy as np
