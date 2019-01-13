@@ -235,7 +235,7 @@ def setup_direction(args, dir_file, net):
         f = h5py.File(dir_file, 'r')
         if (args.y and 'ydirection' in f.keys()) or 'xdirection' in f.keys():
             f.close()
-            print ("%s is already setted up" % dir_file)
+            print ("%s is already set up" % dir_file)
             return
         f.close()
 
