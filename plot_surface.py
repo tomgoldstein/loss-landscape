@@ -70,13 +70,16 @@ def setup_surface_file(args, surf_file, dir_file):
     return surf_file
 
 
-def crunch(surf_file, net, w, s, d, dataloader, loss_key, acc_key, comm, rank, args):
+def crunch(surf_file, net, w, s, d, dataloader, loss_key, acc_key, args):
     """
         Calculate the loss values and accuracies of modified models in parallel
         using MPI reduce.
     """
+    
+    rank = args.rank
+    nproc = args.of
 
-    f = h5py.File(surf_file, 'r+' if rank == 0 else 'r')
+    f = h5py.File(surf_file, 'r')
     losses, accuracies = [], []
     xcoordinates = f['xcoordinates'][:]
     ycoordinates = f['ycoordinates'][:] if 'ycoordinates' in f.keys() else None
@@ -95,7 +98,7 @@ def crunch(surf_file, net, w, s, d, dataloader, loss_key, acc_key, comm, rank, a
     # Generate a list of indices of 'losses' that need to be filled in.
     # The coordinates of each unfilled index (with respect to the direction vectors
     # stored in 'd') are stored in 'coords'.
-    inds, coords, inds_nums = scheduler.get_job_indices(losses, xcoordinates, ycoordinates, comm)
+    inds, coords, inds_nums = scheduler.get_job_indices(losses, xcoordinates, ycoordinates, rank=rank, nproc=nproc)
 
     print('Computing %d values for rank %d'% (len(inds), rank))
     start_time = time.time()
@@ -127,16 +130,18 @@ def crunch(surf_file, net, w, s, d, dataloader, loss_key, acc_key, comm, rank, a
 
         # Send updated plot data to the master node
         syc_start = time.time()
-        losses     = mpi.reduce_max(comm, losses)
-        accuracies = mpi.reduce_max(comm, accuracies)
+        #losses     = mpi.reduce_max(comm, losses)
+        #accuracies = mpi.reduce_max(comm, accuracies)
         syc_time = time.time() - syc_start
         total_sync += syc_time
 
-        # Only the master node writes to the file - this avoids write conflicts
-        if rank == 0:
-            f[loss_key][:] = losses
-            f[acc_key][:] = accuracies
+        # Periodically write to file, and always write after last update
+        if count%10 == rank or count == len(inds)-1:
+            f = h5py.File(surf_file, 'r+')
+            f[loss_key][losses!=-1] = losses[losses!=-1]
+            f[acc_key][accuracies!=-1] = accuracies[accuracies!=-1]
             f.flush()
+            f.close()
 
         print('Evaluating rank %d  %d/%d  (%.1f%%)  coord=%s \t%s= %.3f \t%s=%.2f \ttime=%.2f \tsync=%.2f' % (
                 rank, count, len(inds), 100.0 * count/len(inds), str(coord), loss_key, loss,
@@ -144,9 +149,9 @@ def crunch(surf_file, net, w, s, d, dataloader, loss_key, acc_key, comm, rank, a
 
     # This is only needed to make MPI run smoothly. If this process has less work than
     # the rank0 process, then we need to keep calling reduce so the rank0 process doesn't block
-    for i in range(max(inds_nums) - len(inds)):
-        losses = mpi.reduce_max(comm, losses)
-        accuracies = mpi.reduce_max(comm, accuracies)
+    #for i in range(max(inds_nums) - len(inds)):
+    #    losses = mpi.reduce_max(comm, losses)
+    #    accuracies = mpi.reduce_max(comm, accuracies)
 
     total_time = time.time() - start_time
     print('Rank %d done!  Total time: %.2f Sync: %.2f' % (rank, total_time, total_sync))
@@ -159,6 +164,8 @@ def crunch(surf_file, net, w, s, d, dataloader, loss_key, acc_key, comm, rank, a
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='plotting loss surface')
     parser.add_argument('--mpi', '-m', action='store_true', help='use mpi')
+    parser.add_argument('--rank', type=int, default=0, help='The rank of this job when multiple jobs are working together')
+    parser.add_argument('--of', type=int, default=1, help='The total number of jobs/ranks that are running')
     parser.add_argument('--cuda', '-c', action='store_true', help='use cuda')
     parser.add_argument('--threads', default=2, type=int, help='number of threads')
     parser.add_argument('--ngpu', type=int, default=1, help='number of GPUs to use for each rank, useful for data parallel evaluation')
@@ -214,7 +221,7 @@ if __name__ == '__main__':
         comm = mpi.setup_MPI()
         rank, nproc = comm.Get_rank(), comm.Get_size()
     else:
-        comm, rank, nproc = None, 0, 1
+        comm, rank, nproc = None, args.rank, args.of
 
     # in case of multiple GPUs per node, set the GPU to use for each rank
     if args.cuda:
@@ -286,7 +293,7 @@ if __name__ == '__main__':
     #--------------------------------------------------------------------------
     # Start the computation
     #--------------------------------------------------------------------------
-    crunch(surf_file, net, w, s, d, trainloader, 'train_loss', 'train_acc', comm, rank, args)
+    crunch(surf_file, net, w, s, d, trainloader, 'train_loss', 'train_acc', args)
     # crunch(surf_file, net, w, s, d, testloader, 'test_loss', 'test_acc', comm, rank, args)
 
     #--------------------------------------------------------------------------

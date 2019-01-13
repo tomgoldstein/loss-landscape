@@ -58,7 +58,7 @@ def split_inds(num_inds, nproc):
     return splitted_idx
 
 
-def get_job_indices(vals, xcoordinates, ycoordinates, comm):
+def get_job_indices(vals, xcoordinates, ycoordinates, rank=0, nproc=1):
     """
     Prepare the job indices over which coordinate to calculate.
 
@@ -76,8 +76,6 @@ def get_job_indices(vals, xcoordinates, ycoordinates, comm):
 
     inds, coords = get_unplotted_indices(vals, xcoordinates, ycoordinates)
 
-    rank = 0 if comm is None else comm.Get_rank()
-    nproc = 1 if comm is None else comm.Get_size()
     splitted_idx = split_inds(len(inds), nproc)
 
     # Split the indices over the available MPI processes
