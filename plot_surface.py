@@ -138,6 +138,7 @@ def crunch(surf_file, net, w, s, d, dataloader, loss_key, acc_key, args):
 
         # Periodically write to file, and always write after last update
         if count%10 == rank or count == len(inds)-1:
+            print('Writing to file')
             f = h5py.File(surf_file, 'r+')
             f[loss_key][losses!=-1] = losses[losses!=-1]
             f[acc_key][accuracies!=-1] = accuracies[accuracies!=-1]
