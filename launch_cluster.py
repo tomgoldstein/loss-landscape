@@ -23,9 +23,9 @@ opts = {   "job_name":"plt",
 opts["setup_command"] = \
 """
 source ~/.bashrc
-/gpfs/scratch/tomg/loss-landscape
+cd /gpfs/scratch/tomg/loss-landscape
 """
-opts["outfile_prefix"] = "/gpfs/scratch/tomg/loss-landscape/logs"
+opts["outfile_prefix"] = "/gpfs/scratch/tomg/loss-landscape/logs/"
 
 nprocs = 5
 
