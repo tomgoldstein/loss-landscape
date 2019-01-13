@@ -7,8 +7,8 @@ import userdata
 
 
 opts = {   "job_name":"plt",
-            "hours":0, #72
-           "mins":1,
+            "hours":100, #72
+           "mins":0,
            "secs":0,
            "account":userdata.get_account(),
            "num_nodes":1,
@@ -27,7 +27,7 @@ cd /gpfs/scratch/tomg/loss-landscape
 """
 opts["outfile_prefix"] = "/gpfs/scratch/tomg/loss-landscape/logs/"
 
-nprocs = 5
+nprocs = 16
 
 command = "python plot_surface.py --ngpu 4  --cuda --model resnet56_noshort --x=-1.2:1.2:1001 --y=-1.2:1.2:1001 "\
  + "--model_file cifar10/trained_nets/resnet56_noshort_sgd_lr=0.1_bs=128_wd=0.0005/model_300.t7 --dir_type weights "\
@@ -36,6 +36,6 @@ command = "python plot_surface.py --ngpu 4  --cuda --model resnet56_noshort --x=
 
 for rank in range(nprocs):
     specs={'rank':rank,
-           'nprocs':13}
+           'nprocs':nprocs}
     opts["job_name"] = "plt{rank}".format(**specs)
     submit_job(command.format(**specs), **opts)
