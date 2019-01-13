@@ -94,6 +94,7 @@ def crunch(surf_file, net, w, s, d, dataloader, loss_key, acc_key, args):
     else:
         losses = f[loss_key][:]
         accuracies = f[acc_key][:]
+    f.close()
 
     # Generate a list of indices of 'losses' that need to be filled in.
     # The coordinates of each unfilled index (with respect to the direction vectors
