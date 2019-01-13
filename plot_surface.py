@@ -228,9 +228,13 @@ if __name__ == '__main__':
         if not torch.cuda.is_available():
             raise Exception('User selected cuda option, but cuda is not available on this machine')
         gpu_count = torch.cuda.device_count()
-        torch.cuda.set_device(rank % gpu_count)
-        print('Rank %d use GPU %d of %d GPUs on %s' %
-              (rank, torch.cuda.current_device(), gpu_count, socket.gethostname()))
+        if args.ngpu==1:
+            torch.cuda.set_device(rank % gpu_count)
+            print('Rank %d use GPU %d of %d GPUs on %s' %
+                  (rank, torch.cuda.current_device(), gpu_count, socket.gethostname()))
+        else:
+            print('Rank %d using %d GPUs on %s' %
+                 (rank, gpu_count, socket.gethostname()))
 
     #--------------------------------------------------------------------------
     # Check plotting resolution
