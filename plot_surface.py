@@ -224,6 +224,9 @@ if __name__ == '__main__':
     else:
         comm, rank, nproc = None, args.rank, args.of
 
+    if rank>=nproc or rank<0 or nproc<=0:
+        raise Exception('Invalid values for rank (%s) and nproc (%s)'%(rank,nproc))
+
     # in case of multiple GPUs per node, set the GPU to use for each rank
     if args.cuda:
         if not torch.cuda.is_available():
