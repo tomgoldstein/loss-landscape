@@ -75,11 +75,11 @@ def crunch(surf_file, net, w, s, d, dataloader, loss_key, acc_key, args):
         Calculate the loss values and accuracies of modified models in parallel
         using MPI reduce.
     """
-    
+
     rank = args.rank
     nproc = args.of
 
-    f = h5py.File(surf_file, 'r')
+    f = h5py.File(surf_file, 'r+' if rank==0 else 'r')
     losses, accuracies = [], []
     xcoordinates = f['xcoordinates'][:]
     ycoordinates = f['ycoordinates'][:] if 'ycoordinates' in f.keys() else None
