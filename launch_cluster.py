@@ -7,15 +7,15 @@ import userdata
 
 
 opts = {   "job_name":"plt",
-            "hours":100, #72
-           "mins":0,
+            "hours":0, #72
+           "mins":1,
            "secs":0,
            "account":userdata.get_account(),
            "num_nodes":1,
            "procs_per_node":1,
            "cpus_per_node":20,
            "queue":"standard",
-           "delete_after_submit":True,  #  Delete the pbs shell script immediately after calling qsub?
+           "delete_after_submit":False,  #  Delete the pbs shell script immediately after calling qsub?
            "call_qsub":True
         }
 
@@ -27,7 +27,7 @@ source ~/.bashrc
 """
 opts["outfile_prefix"] = "/gpfs/scratch/tomg/loss-landscape/logs"
 
-nprocs = 13
+nprocs = 5
 
 command = "python plot_surface.py --ngpu 4  --cuda --model resnet56_noshort --x=-1.2:1.2:1001 --y=-1.2:1.2:1001 "\
  + "--model_file cifar10/trained_nets/resnet56_noshort_sgd_lr=0.1_bs=128_wd=0.0005/model_300.t7 --dir_type weights "\
