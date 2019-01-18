@@ -136,6 +136,10 @@ def crunch(surf_file, net, w, s, d, dataloader, loss_key, acc_key, args):
         syc_time = time.time() - syc_start
         total_sync += syc_time
 
+        print('Evaluating rank %d  %d/%d  (%.1f%%)  coord=%s \t%s= %.3f \t%s=%.2f \ttime=%.2f \tsync=%.2f' % (
+                rank, count, len(inds), 100.0 * count/len(inds), str(coord), loss_key, loss,
+                acc_key, acc, loss_compute_time, syc_time))
+        
         # Periodically write to file, and always write after last update
         if count%90 == 6*rank or count == len(inds)-1:
             print('Writing to file')
@@ -145,9 +149,7 @@ def crunch(surf_file, net, w, s, d, dataloader, loss_key, acc_key, args):
             f.flush()
             f.close()
 
-        print('Evaluating rank %d  %d/%d  (%.1f%%)  coord=%s \t%s= %.3f \t%s=%.2f \ttime=%.2f \tsync=%.2f' % (
-                rank, count, len(inds), 100.0 * count/len(inds), str(coord), loss_key, loss,
-                acc_key, acc, loss_compute_time, syc_time))
+
 
     # This is only needed to make MPI run smoothly. If this process has less work than
     # the rank0 process, then we need to keep calling reduce so the rank0 process doesn't block
