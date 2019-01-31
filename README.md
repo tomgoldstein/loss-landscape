@@ -4,6 +4,8 @@
 This repository contains the PyTorch code for the paper
 > Hao Li, Zheng Xu, Gavin Taylor, Christoph Studer and Tom Goldstein. [*Visualizing the Loss Landscape of Neural Nets*](https://arxiv.org/abs/1712.09913). NIPS, 2018.
 
+An interactive 3D visualizer for loss surfaces has been provided by [telesens](http://www.telesens.co/2019/01/16/neural-network-loss-visualization/).
+
 Given a network architecture and its pre-trained parameters, this tool calculates and visualizes the loss surface along random direction(s) near the optimal parameters.
 The calculation can be done in parallel with multiple GPUs per node, and multiple nodes.
 The random direction(s) and loss surface values are stored in HDF5 (`.h5`) files after they are produced.
