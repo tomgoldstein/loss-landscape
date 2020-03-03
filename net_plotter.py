@@ -25,7 +25,7 @@ def set_weights(net, weights, directions=None, step=None):
     if directions is None:
         # You cannot specify a step length without a direction.
         for (p, w) in zip(net.parameters(), weights):
-            p.data.copy_(w.type(type(p.data)))
+            p.data.copy_(w.type_as(p.data.dtype))
     else:
         assert step is not None, 'If a direction is specified then step must be specified as well'
 
@@ -37,7 +37,7 @@ def set_weights(net, weights, directions=None, step=None):
             changes = [d*step for d in directions[0]]
 
         for (p, w, d) in zip(net.parameters(), weights, changes):
-            p.data = w + torch.Tensor(d).type(type(w))
+            p.data = w + torch.Tensor(d).type_as(w.dtype)
 
 
 def set_states(net, states, directions=None, step=None):
@@ -59,7 +59,7 @@ def set_states(net, states, directions=None, step=None):
         assert (len(new_states) == len(changes))
         for (k, v), d in zip(new_states.items(), changes):
             d = torch.tensor(d)
-            v.add_(d.type(v.type()))
+            v.add_(d.type_as(v.dtype))
 
         net.load_state_dict(new_states)
 
