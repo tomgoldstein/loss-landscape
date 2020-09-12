@@ -8,6 +8,7 @@ from os.path import exists, commonprefix
 import h5py
 import h5_util
 import model_loader
+import os
 
 ################################################################################
 #                 Supporting functions for weights manipulation
@@ -230,6 +231,10 @@ def setup_direction(args, dir_file, net):
     print('-------------------------------------------------------------------')
     print('setup_direction')
     print('-------------------------------------------------------------------')
+    
+    # Setup env for preventing lock on h5py file for newer h5py versions
+    os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
+    
     # Skip if the direction file already exists
     if exists(dir_file):
         f = h5py.File(dir_file, 'r')
