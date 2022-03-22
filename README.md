@@ -19,18 +19,18 @@ The random direction(s) and loss surface values are stored in HDF5 (`.h5`) files
 - [mpi4py 2.0.0](https://mpi4py.scipy.org/docs/usrman/install.html)
 - [numpy 1.15.1](https://docs.scipy.org/doc/numpy/user/quickstart.html)  
 - [h5py 2.7.0](http://docs.h5py.org/en/stable/build.html#install)
-- [matplotlib ](https://matplotlib.org/users/installing.html)
+- [matplotlib](https://matplotlib.org/users/installing.html)
 - [scipy ](https://www.scipy.org/install.html)
 - scikit-learn
 - seaborn
-For python library, you can use `pip install -r requirements.txt`
 
-
+You need to first install openmpi or openmpilib, then
 You *may* need to run the command to enable the `mpi`.
 ```
 module load mpi
 ```
 
+For python library, you can use `pip install -r requirements.txt`
 
 
 **Pre-trained models**:
