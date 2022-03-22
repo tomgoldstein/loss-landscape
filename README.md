@@ -113,6 +113,10 @@ python plot_2D.py --surf_name train_loss --surf_file path_to_surf_file
 `plot_2D.py` can make a basic 3D loss surface plot with `matplotlib`.
 If you want a more detailed rendering that uses lighting to display details, you can render the loss surface with [ParaView](http://paraview.org).
 
+```
+MESA_GL_VERSION_OVERRIDE=3.2 ./paraview
+```
+
 ![ResNet-56-noshort](doc/images/resnet56_noshort_small.jpg) ![ResNet-56](doc/images/resnet56_small.jpg)
 
 To do this, you must
