@@ -12,14 +12,26 @@ The random direction(s) and loss surface values are stored in HDF5 (`.h5`) files
 
 ## Setup
 
+
 **Environment**: One or more multi-GPU node(s) with the following software/libraries installed:
-- [PyTorch 0.4](https://pytorch.org/)
-- [openmpi 3.1.2](https://www.open-mpi.org/)
+- [PyTorch 1.3.1](https://pytorch.org/)
+- [openmpi 3.1.2](https://www.open-mpi.org/)  and  `sudo yum install openmpi-devel`
 - [mpi4py 2.0.0](https://mpi4py.scipy.org/docs/usrman/install.html)
 - [numpy 1.15.1](https://docs.scipy.org/doc/numpy/user/quickstart.html)  
 - [h5py 2.7.0](http://docs.h5py.org/en/stable/build.html#install)
-- [matplotlib 2.0.2](https://matplotlib.org/users/installing.html)
-- [scipy 0.19](https://www.scipy.org/install.html)
+- [matplotlib](https://matplotlib.org/users/installing.html)
+- [scipy ](https://www.scipy.org/install.html)
+- scikit-learn
+- seaborn
+
+You need to first install openmpi or openmpilib, then
+You *may* need to run the command to enable the `mpi`.
+```
+module load mpi
+```
+
+For python library, you can use `pip install -r requirements.txt`
+
 
 **Pre-trained models**:
 The code accepts pre-trained PyTorch models for the CIFAR-10 dataset.
@@ -60,8 +72,8 @@ Then we can sample loss values along this direction.
 
 ```
 mpirun -n 4 python plot_surface.py --mpi --cuda --model vgg9 --x=-1:1:51 \
---model_file cifar10/trained_nets/vgg9_sgd_lr=0.1_bs=128_wd=0.0_save_epoch=1/model_300.t7 \
---dir_type weights --xnorm filter --xignore biasbn --plot
+--dir_type weights --xnorm filter --xignore biasbn --plot \
+--model_file vgg9_sgd_lr=0.1_bs=128_wd=0.0_save_epoch=1/model_300.t7
 ```
  - `--dir_type weights` indicates the direction has the same dimensions as the learned parameters, including bias and parameters in the BN layers.
  - `--xnorm filter` normalizes the random direction at the filter level. Here, a "filter" refers to the parameters that produce a single feature map.  For fully connected layers, a "filter" contains the weights that contribute to a single neuron.
@@ -81,8 +93,8 @@ To plot the loss contours, we choose two random directions and normalize them in
 
 ```
 mpirun -n 4 python plot_surface.py --mpi --cuda --model resnet56 --x=-1:1:51 --y=-1:1:51 \
---model_file cifar10/trained_nets/resnet56_sgd_lr=0.1_bs=128_wd=0.0005/model_300.t7 \
---dir_type weights --xnorm filter --xignore biasbn --ynorm filter --yignore biasbn  --plot
+--dir_type weights --xnorm filter --xignore biasbn --ynorm filter --yignore biasbn  --plot \
+--model_file cifar10/trained_nets/resnet56_sgd_lr=0.1_bs=128_wd=0.0005/model_300.t7
 ```
 
 ![ResNet-56](doc/images/resnet56_sgd_lr=0.1_bs=128_wd=0.0005/model_300.t7_weights_xignore=biasbn_xnorm=filter_yignore=biasbn_ynorm=filter.h5_[-1.0,1.0,51]x[-1.0,1.0,51].h5_train_loss_2dcontour.jpg)
@@ -90,7 +102,7 @@ mpirun -n 4 python plot_surface.py --mpi --cuda --model resnet56 --x=-1:1:51 --y
 Once a surface is generated and stored in a `.h5` file, we can produce and customize a contour plot using the script `plot_2D.py`.
 
 ```
-python plot_2D.py --surf_file path_to_surf_file --surf_name train_loss
+python plot_2D.py --surf_name train_loss --surf_file path_to_surf_file 
 ```
 - `--surf_name` specifies the type of surface. The default choice is `train_loss`,
 - `--vmin` and `--vmax` sets the range of values to be plotted.
@@ -101,12 +113,16 @@ python plot_2D.py --surf_file path_to_surf_file --surf_name train_loss
 `plot_2D.py` can make a basic 3D loss surface plot with `matplotlib`.
 If you want a more detailed rendering that uses lighting to display details, you can render the loss surface with [ParaView](http://paraview.org).
 
+```
+MESA_GL_VERSION_OVERRIDE=3.2 ./paraview
+```
+
 ![ResNet-56-noshort](doc/images/resnet56_noshort_small.jpg) ![ResNet-56](doc/images/resnet56_small.jpg)
 
 To do this, you must
 1. Convert the surface `.h5` file to a `.vtp` file.
 ```
-python h52vtp.py --surf_file path_to_surf_file --surf_name train_loss --zmax  10 --log
+python h52vtp.py --surf_name train_loss --zmax  10 --log --surf_file path_to_surf_file
 ```
    This will generate a [VTK](https://www.kitware.com/products/books/VTKUsersGuide.pdf) file containing the loss surface with max value 10 in the log scale.
 
